@@ -1,0 +1,20 @@
+<html>
+	<head>
+		<title>Equip Region Checker</title>
+		<!-- <script src="vdf.js"></script> -->
+		<script src="equip_check.js"></script>
+		<script>
+			window.onload = function() {
+				var item_list = null;
+				var item_data_loaded = function(data){
+					//item_list = data; 
+					item_list = JSON.parse(data); 
+					console.log(find_item('gunboats', item_list));
+					console.log(find_item('Vive La France', item_list));
+				};
+				fetch_item_list(item_data_loaded);
+			};
+		</script>
+	</head>
+	<body></body>
+</html>
