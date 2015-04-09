@@ -11,10 +11,11 @@ def parse_client_schema(schema_file='client_schema.vdf'):
         for obj_id, obj in data['items_game']['items'].iteritems():
             item = {}
             if 'name' in obj:
+                sanitized_name = obj['name'].lower().replace(' ','').replace('\'', '')
                 item['name'] = obj['name']
             else:
+                sanitized_name = obj_id
                 item['name'] = obj_id
-
             # Classes
             if 'used_by_classes' in obj:
                 item['used_by_classes'] = [class_name for class_name in obj['used_by_classes']]
@@ -35,7 +36,7 @@ def parse_client_schema(schema_file='client_schema.vdf'):
                     if sp in obj['prefab']:
                         item['equip_regions'].append(sp)
 
-            items[obj['name']] = item
+            items[sanitized_name] = item
 
         return items
 
