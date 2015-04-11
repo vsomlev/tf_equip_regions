@@ -20,13 +20,10 @@
 					test_items.push(find_item('Summer Shades', item_list));
 					test_items.push(find_item('friendly item', item_list));
 
-					console.log(test_items[6]);
-					console.log(test_items[7]);
-
 					console.log(has_conflict(test_items[1], test_items[2]));
-					console.log(has_conflict(test_items[1], test_items[6]));
-					console.log(has_conflict(test_items[5], test_items[6]));
-					console.log(has_conflict(test_items[6], test_items[7]));
+					console.log(has_conflict(test_items[1], test_items[4]));
+ 					console.log(has_conflict(test_items[6], test_items[7]));
+ 					console.log(has_conflict(test_items[5], test_items[6]));
 				};
 				fetch_item_list(item_data_loaded);
 			};

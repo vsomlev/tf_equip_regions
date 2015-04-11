@@ -46,6 +46,7 @@ function fetch_item_list(done_cb){
 	});
 };
 
+// Only for testing, wont be used for production.
 function find_item(partial_name, item_list){
 	partial_name = partial_name.toLowerCase().replace(/\s+/g, '').replace(/'/g, '');
 	// 1. Full match
@@ -63,6 +64,11 @@ function find_item(partial_name, item_list){
 	return null;
 };
 
+//////////////////////
+/// Conflict detection
+//////////////////////
+
+// does 'whole head' conflict with 'lenses' by transitivity?
 conflicts_table = {
 	'glasses' : ['face', 'lenses'],
 	'whole head' : ['hat', 'face', 'glasses'],
@@ -70,43 +76,35 @@ conflicts_table = {
 };
 
 function has_conflict(itema, itemb){
+	console.log('---------------------');
 	console.log('Comparing ' + itema['name'] + ' vs ' + itemb['name']);
 	eqa = itema['equip_regions'];
 	eqb = itemb['equip_regions'];
+	// eqb.push('medal'); // for testing
+
+	console.log('[' + eqa + '] vs [' + eqb + ']');
 
 	// 1. Simple checks first
-	for (var i in eqa){
-		if(eqb.indexOf(eqa[i])>-1){
-			console.log('CONFLICT same equip region ' + eqa[i]);
-			return true;
-		}
-	}
+	has_simple_conflict = eqa.some(function(x){return eqb.indexOf(x)>-1});
+	if(has_simple_conflict) return true;
 
 	// 2. Using the conflicts_table from above
-	// Checks if eq1 has an item that is a key in the conflict table.
-	// If it has one, check if one of the conflicting regions are present in eq2.
+	// bad comment-style below:
 	var table_check = function(eq1, eq2){
-		for(var region1 in conflicts_table){
-			if(eq1.indexOf(region1)>-1){
-				for(var region2_idx in conflicts_table[region1]){
-					var region2 = conflicts_table[region1][region2_idx];
-					if(eq2.indexOf(region2)>-1){
-						console.log('CONFLICT table ' + region1 + ' vs ' + region2); 
-						// console.log(eq1);
-						// console.log(eq2);
-						return true;
-					}
-				}
-			}
-		}
-		return false;
+		// does the first item (eq1) have a region that is present in the conflicts_table?:
+		// alternatively use filter(), count it, then map() if len>0
+		var problematic_regions = eq1.map(function(x){return conflicts_table[x]});
+		if(typeof problematic_regions[0] === 'undefined') return false;
+		// flatten when there are multiple conflict-able regions
+		var problematic_regions = problematic_regions.reduce(function(a,b){return a.concat(b)});
+
+		// does the second item (eq2) has any of these conflicting regions?:
+		var has_conflict = problematic_regions.some(function(x){return eq2.indexOf(x)>-1});
+		return has_conflict;
 	};
-	table_check_ab = table_check(eqa, eqb);
-	table_check_ba = table_check(eqb, eqa);
+	
+	tc_ab = table_check(eqa, eqb);
+	tc_ba = table_check(eqb, eqa);
 
-	if(table_check_ab || table_check_ba){
-		return true;
-	}
-
-	return false;
+	return (tc_ab || tc_ba);
 };
