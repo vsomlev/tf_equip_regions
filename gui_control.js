@@ -1,3 +1,11 @@
+function data_fetch(done_cb){
+	$.ajax({
+		url: 'items_data.json',
+		success: done_cb,
+		error: function(x) {alert('Failed loading the items description. Refresh and try again.');}
+	});
+};
+
 function check_conflicts(){
 	$('#conflict-status').html('Checking...');
 	var conflict_status = '';
@@ -6,7 +14,7 @@ function check_conflicts(){
 		var itemA = selected_items[i];
 		for(var j=i+1; j<selected_items.length; j++){
 			var itemB = selected_items[j];
-			var conflict = has_conflict(itemA, itemB);
+			var conflict = has_conflicts(itemA, itemB);
 			if(conflict){
 				conflict_status += "Conflict between '" + itemA['name'] + "' and '" + itemB['name'] + "'.<br/>";
 			}
@@ -52,7 +60,7 @@ function update_autocomplete(){
 function on_data_loaded(data){
 	selected_items = [];
 	class_filter = 'all';
-	items_list = JSON.parse(data); 
+	items_list = data;
 	$('#selector-table').show();
 	$('#loading-text').hide();
 

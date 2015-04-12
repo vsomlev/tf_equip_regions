@@ -1,24 +1,14 @@
-function data_fetch(done_cb){
-	$.ajax({
-		url: 'items_data.txt',
-		success: done_cb,
-		error: function(x) {alert('Failed loading the items description. Refresh and try again.');}
-	});
-};
-
 // does 'whole head' conflict with 'lenses' by transitivity?
 conflicts_table = {
 	'glasses' : ['face', 'lenses'],
-	'whole_head' : ['hat', 'face', 'glasses'],
+	'whole_head' : ['hat', 'face', 'glasses', 'lenses'],
 	'medal' : ['tournament_medal']
 };
 
-function has_conflict(itema, itemb){
+function has_conflicts(itema, itemb){
 	if(typeof itema == 'undefined' || typeof itemb == 'undefined'){
 		return false;
 	}
-	// console.log('---------------------');
-	// console.log('Comparing ' + itema['name'] + ' vs ' + itemb['name']);
 	eqa = itema['equip_regions'];
 	eqb = itemb['equip_regions'];
 
@@ -31,14 +21,14 @@ function has_conflict(itema, itemb){
 	// 2. Using the conflicts_table from above
 	// bad comment-style below:
 	var table_check = function(eq1, eq2){
-		// does the first item (eq1) have a region that is present in the conflicts_table?:
-		// alternatively use filter(), count it, then map() if len>0
+		// 2.1. does the first item (eq1) have a region that is present in the conflicts_table?:
 		var problematic_regions = eq1.map(function(x){return conflicts_table[x]});
+		// map() will return a list with a single 'undefined' instead of an empty list
 		if(typeof problematic_regions[0] === 'undefined') return false;
-		// flatten when there are multiple conflict-able regions
+		// 2.2. flatten when there are multiple conflict-able regions
 		var problematic_regions = problematic_regions.reduce(function(a,b){return a.concat(b)});
 
-		// does the second item (eq2) has any of these conflicting regions?:
+		// 2.3. does the second item (eq2) has some() of these conflicting regions?:
 		var has_conflict = problematic_regions.some(function(x){return eq2.indexOf(x)>-1});
 		return has_conflict;
 	};
