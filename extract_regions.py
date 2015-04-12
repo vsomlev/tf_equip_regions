@@ -6,8 +6,6 @@ from pprint import pprint
 client_schema_file = 'schema_client.vdf'
 main_schema_file = 'schema_main.json'
 
-# TODO: Makes sure that this list works as intended.
-special_prefabs = set(['hat', 'tournament_medal', 'powerup_bottle', 'backpack'])
 ignore_item_classes = ['tool', 'supply_crate']
 accept_item_classes = ['tf_wearable', 'tf_weapon_medigun', 'tf_powerup_bottle']
 
@@ -24,6 +22,15 @@ def prop(dic, prop_name):
 def parse_schema():
     with open(client_schema_file) as client_schema, open(main_schema_file) as main_schema:
         client_schema = vdf.parse(client_schema)
+
+        # Parsing the prefabs
+        schema_prefabs = {}
+        for pf_name, pf in client_schema['items_game']['prefabs'].iteritems():
+            pf_equip_region = prop(pf, 'equip_region')
+            if len(pf_equip_region)>0:
+                schema_prefabs[pf_name] = list(pf_equip_region)
+
+        # Parsing the items
         items_tmp = {}
         items = {}
 
@@ -39,12 +46,16 @@ def parse_schema():
             item['equip_regions'] = set()
             item['equip_regions'] |= prop(obj, 'equip_regions')
             item['equip_regions'] |= prop(obj, 'equip_region')
-            # for now keep all prefabs?
-            item['equip_regions'] |= prop(obj, 'prefab')
+
             # Prefab also affects the equip regions
-            # obj_prefabs = prop(obj, 'prefab')
-            # special_prefab_matches = obj_prefabs & special_prefabs
-            # item['equip_regions'] |= special_prefab_matches
+            # for each of the item's prefabs, get that
+            # prefab's equip regions and add them to the item's
+            if 'prefab' in obj:
+                item_prefabs = set(obj['prefab'].split(' '))
+                prefab_equip_regions = set()
+                for ipf in item_prefabs:
+                    prefab_equip_regions |= prop(schema_prefabs, ipf)
+                item['equip_regions'] |= prefab_equip_regions
 
             items_tmp[item_name] = item
 

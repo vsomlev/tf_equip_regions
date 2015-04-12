@@ -28,7 +28,7 @@ function check_conflicts(){
 	}
 };
 
-function on_select_update(event, ui){
+function on_item_select(event, ui){
 	var item_idx = event.target.id.split('-')[1];
 
 	var new_item = items_list[ui.item.value];
@@ -49,7 +49,7 @@ function update_autocomplete(){
 	}
 	var autocomplete_options = {
 		source: items_names_list,
-		select: on_select_update
+		select: on_item_select
 	};
 	$("#item-1-entry").autocomplete(autocomplete_options);
 	$("#item-2-entry").autocomplete(autocomplete_options);
@@ -67,7 +67,7 @@ function on_data_loaded(data){
 	update_autocomplete();
 };
 
-function set_class_filter(x){
-	class_filter = x.target.value;
+function set_class_filter(event){
+	class_filter = event.target.value;
 	update_autocomplete();
 };
