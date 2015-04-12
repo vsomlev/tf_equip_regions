@@ -3,9 +3,8 @@ import vdf
 import json
 from pprint import pprint
 
-
-client_schema_file = 'client_schema.vdf'
-schema_file = 'schema.json'
+client_schema_file = 'schema_client.vdf'
+schema_file = 'schema_main.json'
 
 def parse_schema():
     with open(client_schema_file) as client_schema, open(schema_file) as schema:
@@ -22,22 +21,33 @@ def parse_schema():
 
             # Character Classes
             if 'used_by_classes' in obj:
-                item['used_by_classes'] = [class_name for class_name in obj['used_by_classes']]
+                item['classes'] = [class_name for class_name in obj['used_by_classes']]
 
             # Equip regions
+            # there's both 'equip_region' as well as 'equip_regions'
+            # they can be either a string, a list, or a dict...
             item['equip_regions'] = []
             if 'equip_regions' in obj:
-                item['equip_regions'] = [eqr for eqr in obj['equip_regions']]
+                obj_eqs = obj['equip_regions']
+                if isinstance(obj_eqs, str):
+                    item['equip_regions'].append(obj_eqs)
+                else:
+                    item['equip_regions'].extend([eqr for eqr in obj_eqs])
             if 'equip_region' in obj:
-                item['equip_regions'].append(obj['equip_region'])
+                obj_eq = obj['equip_region']
+                if isinstance(obj_eq, str):
+                    item['equip_regions'].append(obj_eq)
+                else:
+                    item['equip_regions'].extend([eqr for eqr in obj_eq])
             
             # Prefab also affects the equip regions
-            # Not sure about 'misc'
             # special_prefabs = ['hat', 'base_hat', 'misc', 'tournament_medal']
             special_prefabs = ['hat', 'tournament_medal', 'powerup_bottle']
             if 'prefab' in obj:
                 for sp in special_prefabs:
-                    if sp in obj['prefab']:
+                    obj_prefab = obj['prefab']
+                    if not isinstance(obj_prefab, list): obj_prefab=[obj_prefab]
+                    if sp in obj_prefab:
                         item['equip_regions'].append(sp)
 
             items_tmp[item_name] = item
@@ -50,27 +60,26 @@ def parse_schema():
             an unfamiliar internal name. The name which is put here is instead the one
             people see in-game.
         """
-        schema = json.loads(schema.read())
-        schema_items = schema['result']['items']
         ignore_item_classes = ['tool', 'supply_crate']
         accept_item_classes = ['tf_wearable', 'tf_weapon_medigun', 'tf_powerup_bottle']
+
+        schema = json.loads(schema.read())
+        schema_items = schema['result']['items']
         for schema_item in schema_items:
-            #if schema_item['item_class'] in ignore_item_classes:
-            #    continue
-            if schema_item['item_class'] not in accept_item_classes:
-                continue
+            # if schema_item['item_class'] in ignore_item_classes: continue
+            if schema_item['item_class'] not in accept_item_classes: continue
             name = schema_item['name']
             item = items_tmp[name]
             real_name = schema_item['item_name']
-            item['image_url'] = schema_item['image_url']
+            if 'used_by_classes' in schema_item and 'classes' not in item:
+                item['classes'] = [cl.lower() for cl in schema_item['used_by_classes']]
+            if 'classes' not in item:
+                item['classes'] = ['all']
             item['name'] = real_name
+            item['image'] = schema_item['image_url']
             items[real_name] = item
 
         return items
 
 items = parse_schema()
-j = json.dumps(items)
-print j
-# pprint(items)
-# for a,b, in items.iteritems():
-#     print a
+print json.dumps(items)

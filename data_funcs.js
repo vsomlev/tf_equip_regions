@@ -1,19 +1,15 @@
-function fetch_item_list(done_cb){
+function data_fetch(done_cb){
 	$.ajax({
-		url: 'equip_regions_list.txt',
+		url: 'items_data.txt',
 		success: done_cb,
 		error: function(x) {alert('Failed loading the items description. Refresh and try again.');}
 	});
 };
 
-//////////////////////
-/// Conflict detection
-//////////////////////
-
 // does 'whole head' conflict with 'lenses' by transitivity?
 conflicts_table = {
 	'glasses' : ['face', 'lenses'],
-	'whole head' : ['hat', 'face', 'glasses'],
+	'whole_head' : ['hat', 'face', 'glasses'],
 	'medal' : ['tournament_medal']
 };
 

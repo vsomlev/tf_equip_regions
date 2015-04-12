@@ -1,75 +1,40 @@
 <html>
 	<head>
 		<title>Equip Region Checker</title>
-		<!-- <script src="vdf.js"></script> -->
-		<script src="equip_check.js"></script>
+		<script src="data_funcs.js"></script>
+		<script src="gui_control.js"></script>
 
 		<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 		<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
 		<script type="text/javascript" src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
 		<script>
-			var check_conflicts = function(){
-				$('#conflict-status').html('Checking...');
-				var conflict_status = '';
-
-				for(var i=0; i<selected_items.length; i++){
-					var itemA = selected_items[i];
-					for(var j=i+1; j<selected_items.length; j++){
-						var itemB = selected_items[j];
-						var conflict = has_conflict(itemA, itemB);
-						if(conflict){
-							conflict_status += "Conflict between '" + itemA['name'] + "' and '" + itemB['name'] + "'.<br/>";
-						}
-					}
-				}
-
-				if(conflict_status.length==0){
-					$('#conflict-status').text("No conflicts!");
-				} else {
-					$('#conflict-status').html(conflict_status);
-				}
-			};
-
-			var on_select_update = function(event, ui){
-				var item_idx = event.target.id.split('-')[1];
-
-				var new_item = items_list[ui.item.value];
-				selected_items[item_idx-1] = new_item;
-
-				var item_image_url = new_item['image_url'];
-				$("#item-"+item_idx+"-image").attr('src', item_image_url);
-
-				check_conflicts();
-			};
-
 			window.onload = function() {
-				var items_data_loaded = function(data){
-					items_list = JSON.parse(data); 
-					selected_items = [];
-					var items_names_list = [];
-					for(var name in items_list){
-						items_names_list.push(items_list[name]['name']);
-					}
-					console.log('FINISHED LOADING ITEMS');
-
-					var autocomplete_options = {
-						source: items_names_list,
-						select: on_select_update
-					};
-					$("#item-1-entry").autocomplete(autocomplete_options);
-					$("#item-2-entry").autocomplete(autocomplete_options);
-					$("#item-3-entry").autocomplete(autocomplete_options);
-					$("#item-4-entry").autocomplete(autocomplete_options);
-				};
-				fetch_item_list(items_data_loaded);
+				data_fetch(on_data_loaded);
+				$('#class-select').change(set_class_filter);
 			};
 	  </script>
 	</head>
 	<body>
-		<div>
+		TITLE TITLE TITLE
+		<div id="loading-text">
+			Loading...
+		</div>
+		<div id="selector-table" style="display:none">
 			<table>
 				<tr>
-					TODO: Limit by class
+					<label>Class restriction:</>
+					<select id='class-select'>
+					  <option value="all">All classes</option>
+					  <option value="scout">Scout</option>
+					  <option value="soldier">Soldier</option>
+					  <option value="pyro">Pyro</option>
+					  <option value="demo">Demoman</option>
+					  <option value="heavy">Heavy</option>
+					  <option value="engi">Engineer</option>
+					  <option value="medic">Medic</option>
+					  <option value="sniper">Sniper</option>
+					  <option value="spy">Spy</option>
+					</select>
 				</tr>
 				<tr>
 					<td>Cosmetic item #1</td>
