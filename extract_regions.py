@@ -2,13 +2,12 @@
 import vdf
 import json
 from pprint import pprint
-from sets import Set
 
 client_schema_file = 'schema_client.vdf'
 main_schema_file = 'schema_main.json'
 
 # TODO: Makes sure that this list works as intended.
-special_prefabs = Set(['hat', 'tournament_medal', 'powerup_bottle'])
+special_prefabs = set(['hat', 'tournament_medal', 'powerup_bottle', 'backpack'])
 ignore_item_classes = ['tool', 'supply_crate']
 accept_item_classes = ['tf_wearable', 'tf_weapon_medigun', 'tf_powerup_bottle']
 
@@ -17,10 +16,10 @@ def prop(dic, prop_name):
     if prop_name in dic: 
         prop = dic[prop_name]
         if isinstance(prop, str): 
-            return Set([prop])
+            return set([prop])
         else:
-            return Set([i.lower() for i in prop])
-    return Set()
+            return set([i.lower() for i in prop])
+    return set()
 
 def parse_schema():
     with open(client_schema_file) as client_schema, open(main_schema_file) as main_schema:
@@ -33,17 +32,19 @@ def parse_schema():
             item_name = obj['name']
 
             # Character Classes
-            item['classes'] = Set()
+            item['classes'] = set()
             item['classes'] |= prop(obj, 'used_by_classes')
 
             # Equip regions
-            item['equip_regions'] = Set()
+            item['equip_regions'] = set()
             item['equip_regions'] |= prop(obj, 'equip_regions')
             item['equip_regions'] |= prop(obj, 'equip_region')
+            # for now keep all prefabs?
+            item['equip_regions'] |= prop(obj, 'prefab')
             # Prefab also affects the equip regions
-            obj_prefabs = prop(obj, 'prefab')
-            special_prefab_matches = obj_prefabs.intersection(special_prefabs)
-            item['equip_regions'] |= special_prefab_matches
+            # obj_prefabs = prop(obj, 'prefab')
+            # special_prefab_matches = obj_prefabs & special_prefabs
+            # item['equip_regions'] |= special_prefab_matches
 
             items_tmp[item_name] = item
 
@@ -67,19 +68,20 @@ def parse_schema():
 
             # sometimes the classes list is only present in the main schema
             item['classes'] |= prop(schema_item, 'used_by_classes')
-            if len(item['classes'])==0 or len(items['classes'])>8:
+            if len(item['classes'])==0 or len(item['classes'])>8:
                 item['classes'] = ['all']
 
             item['name'] = ingame_name
             item['image'] = schema_item['image_url']
 
-            # json doesn't like Sets
-            item['equip_regions'] = list(item['equip_regions'])
-            item['classes'] = list(item['classes'])
-
             items[ingame_name] = item
 
         return items
 
+def set_default(obj):
+    ''' json doesn't like sets '''
+    if isinstance(obj, set): return list(obj)
+    raise TypeError
+
 items = parse_schema()
-print json.dumps(items)
+print json.dumps(items, default=set_default)
