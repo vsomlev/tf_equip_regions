@@ -6,7 +6,7 @@ function data_fetch(done_cb){
 	});
 };
 
-function check_conflicts(){
+function update_conflicts(){
 	$('#conflict-status').html('Checking...');
 	var conflict_status = '';
 
@@ -22,14 +22,14 @@ function check_conflicts(){
 	}
 
 	if(conflict_status.length==0){
-		$('#conflict-status').text("No conflicts!");
+		$('#conflict-status').html("No conflicts!");
 	} else {
 		$('#conflict-status').html(conflict_status);
 	}
 };
 
 function on_item_select(event, ui){
-	var item_idx = event.target.id.split('-')[1];
+    var item_idx = parseInt(event.target.id.split('-')[1]);
 
 	var new_item = items_list[ui.item.value];
 	selected_items[item_idx-1] = new_item;
@@ -37,7 +37,16 @@ function on_item_select(event, ui){
 	var item_image_url = new_item['image'];
 	$("#item-"+item_idx+"-image").attr('src', item_image_url);
 
-	check_conflicts();
+	update_conflicts();
+};
+
+function clear_item(event, ui){
+  var item_idx = parseInt(event.target.id.split('-')[2]);
+  selected_items[item_idx-1] = undefined;
+  $("#item-"+item_idx+"-entry").val('');
+  $("#item-"+item_idx+"-image").attr('src', 'empty.png');
+  
+  update_conflicts();
 };
 
 function update_autocomplete(){
@@ -51,10 +60,7 @@ function update_autocomplete(){
 		source: items_names_list,
 		select: on_item_select
 	};
-	$("#item-1-entry").autocomplete(autocomplete_options);
-	$("#item-2-entry").autocomplete(autocomplete_options);
-	$("#item-3-entry").autocomplete(autocomplete_options);
-	$("#item-4-entry").autocomplete(autocomplete_options);
+    $(".item-entry").autocomplete(autocomplete_options);
 };
 
 function on_data_loaded(data){
