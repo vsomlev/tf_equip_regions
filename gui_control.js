@@ -6,6 +6,15 @@ function data_fetch(done_cb){
 	});
 };
 
+function has_conflicts(itemA, itemB){
+	if(typeof itemA == 'undefined' || typeof itemB == 'undefined') return false;
+
+	var eqa = itemA['e'];
+	var eqb = itemB['e'];
+    // intersection
+    return eqa.some(function(x){return eqb.indexOf(x)!=-1});
+};
+
 function update_conflicts(){
 	$('#conflict-status').html('Checking...');
 	var conflict_status = '';
@@ -32,9 +41,14 @@ function on_item_select(event, ui){
     var item_idx = parseInt(event.target.id.split('-')[1]);
 
 	var new_item = items_list[ui.item.value];
+    new_item['name'] = ui.item.value;
 	selected_items[item_idx-1] = new_item;
 
-	var item_image_url = new_item['image'];
+    var item_image_name = new_item['i'];
+    var item_image_url = 'empty.png';
+    if(item_image_name){
+        item_image_url = "http://media.steampowered.com/apps/440/icons/" + item_image_name;
+    }
 	$("#item-"+item_idx+"-image").attr('src', item_image_url);
 
 	update_conflicts();
@@ -52,8 +66,8 @@ function clear_item(event, ui){
 function update_autocomplete(){
 	var items_names_list = [];
 	for(var name in items_list){
-		if(class_filter=='all' || items_list[name]['classes'].indexOf('all')>-1 || items_list[name]['classes'].indexOf(class_filter)>-1){
-			items_names_list.push(items_list[name]['name']);
+		if(class_filter=='all' || items_list[name]['c'].length==0 || items_list[name]['c'].indexOf(class_filter)>-1){
+			items_names_list.push(name);
 		}
 	}
 	var autocomplete_options = {
