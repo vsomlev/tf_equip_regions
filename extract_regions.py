@@ -28,7 +28,7 @@ def parse_schema():
     with open(client_schema_file) as client_schema, open(main_schema_file) as main_schema:
         client_schema = vdf.parse(client_schema)
 
-        # Parsing the prefabs
+        # Parsing the prefabs' equip regions
         schema_prefabs = {}
         for pf_name, pf in client_schema['items_game']['prefabs'].iteritems():
             pf_equip_region = prop(pf, 'equip_region')
@@ -64,9 +64,9 @@ def parse_schema():
                 item_prefabs = set(obj['prefab'].split(' '))
                 for ipf in item_prefabs:
                     equip_regions |= prop(schema_prefabs, ipf)
-                
+            item['e'] = set(equip_regions)    
+            
             # add equip_regions from the conflicts_table dict
-            item['e'] = set(equip_regions)
             for eq in equip_regions:
                 if eq in conflicts_table:
                     item['e'] |= set(conflicts_table[eq])
@@ -93,9 +93,8 @@ def parse_schema():
 
             # sometimes the classes list is only present in the main schema
             item['c'] |= prop(schema_item, 'used_by_classes')
-            if len(item['c'])==9:
-                item['c'] = []
-                # deleting this elemnt saves only ~2KiB
+            if len(item['c'])==9: item['c'] = []
+            # deleting this element if empty saves only ~2KiB, so don't bother
             
             # the common image location prefix is 45 characters long (saving ~65KiB)
             # http://media.steampowered.com/apps/440/icons/
@@ -104,7 +103,6 @@ def parse_schema():
             ingame_name = schema_item['item_name']
             items[ingame_name] = item
         
-
         return items
 
 def set_default(obj):

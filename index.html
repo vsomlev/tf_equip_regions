@@ -9,7 +9,7 @@
 		<script type="text/javascript" src="gui_control.js"></script>
 		<script>
 			window.onload = function() {
-				data_fetch(on_data_loaded);
+				data_fetch();
 				$('#class-select').change(set_class_filter);
 				$('.clear-entry').click(clear_item);
 			};
@@ -45,17 +45,6 @@
 				</tr>
 				<tr>
 					<td>
-						<input class='item-entry' id="item-1-entry"><button class='clear-entry' id='clear-item-1'>Clear</button>
-					</td><td>
-						<input class='item-entry' id="item-2-entry"><button class='clear-entry' id='clear-item-2'>Clear</button>
-					</td><td>
-						<input class='item-entry' id="item-3-entry"><button class='clear-entry' id='clear-item-3'>Clear</button>
-					</td><td>
-						<input class='item-entry' id="item-4-entry"><button class='clear-entry' id='clear-item-4'>Clear</button>
-					</td>
-				</tr>
-				<tr>
-					<td>
 						<img id="item-1-image" class="item-image" src="empty.png"/><br>
 					</td><td>
 						<img id="item-2-image" class="item-image" src="empty.png"/><br>
@@ -63,6 +52,17 @@
 						<img id="item-3-image" class="item-image" src="empty.png"/><br>
 					</td><td>
 						<img id="item-4-image" class="item-image" src="empty.png"/><br>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input class='item-entry' id="item-1-entry"><button class='clear-entry' id='clear-item-1'>Clear</button>
+					</td><td>
+						<input class='item-entry' id="item-2-entry"><button class='clear-entry' id='clear-item-2'>Clear</button>
+					</td><td>
+						<input class='item-entry' id="item-3-entry"><button class='clear-entry' id='clear-item-3'>Clear</button>
+					</td><td>
+						<input class='item-entry' id="item-4-entry"><button class='clear-entry' id='clear-item-4'>Clear</button>
 					</td>
 				</tr>
 			</table>
